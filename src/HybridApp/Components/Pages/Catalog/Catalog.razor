@@ -9,7 +9,11 @@
 <div class="catalog">
     <eShop.HybridApp.Components.Pages.Catalog.CatalogSearch BrandId="@BrandId" ItemTypeId="@ItemTypeId" />
 
-    @if (catalogResult is null)
+    @if (errorMessage is not null)
+    {
+        <p class="text-danger">Error: @errorMessage</p>
+    }
+    else if (catalogResult is null)
     {
         <p>Loading...</p>
     }
@@ -46,16 +50,25 @@
     public int? ItemTypeId { get; set; }
 
     CatalogResult? catalogResult;
+    string? errorMessage;
 
     static IEnumerable<int> GetVisiblePageIndexes(CatalogResult result)
         => Enumerable.Range(1, (int)Math.Ceiling(1.0 * result.Count / PageSize));
 
     protected override async Task OnParametersSetAsync()
     {
-        catalogResult = await CatalogService.GetCatalogItems(
-            Page.GetValueOrDefault(1) - 1,
-            PageSize,
-            BrandId,
-            ItemTypeId);
+        errorMessage = null;
+        try
+        {
+            catalogResult = await CatalogService.GetCatalogItems(
+                Page.GetValueOrDefault(1) - 1,
+                PageSize,
+                BrandId,
+                ItemTypeId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
     }
 }

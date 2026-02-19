@@ -57,6 +57,7 @@ var webHooksApi = builder.AddProject<Projects.Webhooks_API>("webhooks-api")
 
 // Reverse proxies
 builder.AddYarp("mobile-bff")
+    .WithEndpoint("http", e => e.Port = 11632)
     .WithExternalHttpEndpoints()
     .ConfigureMobileBffRoutes(catalogApi, orderingApi, identityApi);
 
